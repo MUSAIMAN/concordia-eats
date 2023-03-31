@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Best Deal</title>
-    <!-- 必要なスタイルシートやスクリプトをここに追加 -->
+   
 </head>
 <body>
     <h1>Best Deal</h1>
