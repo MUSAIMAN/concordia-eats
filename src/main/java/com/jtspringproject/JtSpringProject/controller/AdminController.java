@@ -1,164 +1,160 @@
 package com.jtspringproject.JtSpringProject.controller;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import com.mysql.cj.protocol.Resultset;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AdminController {
 	int adminlogcheck = 0;
 	String usernameforclass = "";
-	@RequestMapping(value = {"/","/logout"})
+
+	@RequestMapping(value = { "/", "/logout" })
 	public String returnIndex() {
-		adminlogcheck =0;
+		adminlogcheck = 0;
 		usernameforclass = "";
 		return "userLogin";
 	}
-	
-	
-	
+
 	@GetMapping("/index")
 	public String index(Model model) {
-		if(usernameforclass.equalsIgnoreCase(""))
+		if (usernameforclass.equalsIgnoreCase(""))
 			return "userLogin";
 		else {
 			model.addAttribute("username", usernameforclass);
 			return "index";
 		}
-			
+
 	}
+
 	@GetMapping("/userloginvalidate")
 	public String userlog(Model model) {
-		
+
 		return "userLogin";
 	}
+
 	@RequestMapping(value = "userloginvalidate", method = RequestMethod.POST)
-	public String userlogin( @RequestParam("username") String username, @RequestParam("password") String pass,Model model) {
-		
-		try
-		{
+	public String userlogin(@RequestParam("username") String username, @RequestParam("password") String pass,
+			Model model) {
+
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
 			Statement stmt = con.createStatement();
-			ResultSet rst = stmt.executeQuery("select * from users where username = '"+username+"' and password = '"+ pass+"' ;");
-			if(rst.next()) {
+			ResultSet rst = stmt.executeQuery(
+					"select * from users where username = '" + username + "' and password = '" + pass + "' ;");
+			if (rst.next()) {
 				usernameforclass = rst.getString(2);
 				return "redirect:/index";
-				}
-			else {
+			} else {
 				model.addAttribute("message", "Invalid Username or Password");
 				return "userLogin";
 			}
-			
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		return "userLogin";
-		
-		
-		
+
 	}
-	
-	
+
 	@GetMapping("/admin")
 	public String adminlogin(Model model) {
-		
+
 		return "adminlogin";
 	}
+
 	@GetMapping("/adminhome")
 	public String adminHome(Model model) {
-		if(adminlogcheck!=0)
+		if (adminlogcheck != 0)
 			return "adminHome";
 		else
 			return "redirect:/admin";
 	}
+
 	@GetMapping("/loginvalidate")
 	public String adminlog(Model model) {
-		
+
 		return "adminlogin";
 	}
+
 	@RequestMapping(value = "loginvalidate", method = RequestMethod.POST)
-	public String adminlogin( @RequestParam("username") String username, @RequestParam("password") String pass,Model model) {
-		
-		if(username.equalsIgnoreCase("admin") && pass.equalsIgnoreCase("123")) {
-			adminlogcheck=1;
+	public String adminlogin(@RequestParam("username") String username, @RequestParam("password") String pass,
+			Model model) {
+
+		if (username.equalsIgnoreCase("admin") && pass.equalsIgnoreCase("123")) {
+			adminlogcheck = 1;
 			return "redirect:/adminhome";
-			}
-		else {
+		} else {
 			model.addAttribute("message", "Invalid Username or Password");
 			return "adminlogin";
 		}
 	}
+
 	@GetMapping("/admin/categories")
 	public String getcategory() {
 		return "categories";
 	}
-	@RequestMapping(value = "admin/sendcategory",method = RequestMethod.GET)
-	public String addcategorytodb(@RequestParam("categoryname") String catname)
-	{
-		try
-		{
+
+	@RequestMapping(value = "admin/sendcategory", method = RequestMethod.GET)
+	public String addcategorytodb(@RequestParam("categoryname") String catname) {
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
 			Statement stmt = con.createStatement();
-			
+
 			PreparedStatement pst = con.prepareStatement("insert into categories(name) values(?);");
-			pst.setString(1,catname);
+			pst.setString(1, catname);
 			int i = pst.executeUpdate();
-			
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		return "redirect:/admin/categories";
 	}
-	
+
 	@GetMapping("/admin/categories/delete")
-	public String removeCategoryDb(@RequestParam("id") int id)
-	{
-		try
-		{
+	public String removeCategoryDb(@RequestParam("id") int id) {
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
 			Statement stmt = con.createStatement();
-			
+
 			PreparedStatement pst = con.prepareStatement("delete from categories where categoryid = ? ;");
 			pst.setInt(1, id);
 			int i = pst.executeUpdate();
-			
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		return "redirect:/admin/categories";
 	}
-	
+
 	@GetMapping("/admin/categories/update")
-	public String updateCategoryDb(@RequestParam("categoryid") int id, @RequestParam("categoryname") String categoryname)
-	{
-		try
-		{
+	public String updateCategoryDb(@RequestParam("categoryid") int id,
+			@RequestParam("categoryname") String categoryname) {
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
 			Statement stmt = con.createStatement();
-			
+
 			PreparedStatement pst = con.prepareStatement("update categories set name = ? where categoryid = ?");
 			pst.setString(1, categoryname);
 			pst.setInt(2, id);
 			int i = pst.executeUpdate();
-			
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		return "redirect:/admin/categories";
 	}
@@ -167,63 +163,63 @@ public class AdminController {
 	public String getproduct(Model model) {
 		return "products";
 	}
+
 	@GetMapping("/admin/products/add")
 	public String addproduct(Model model) {
 		return "productsAdd";
 	}
 
 	@GetMapping("/admin/products/update")
-	public String updateproduct(@RequestParam("pid") int id,Model model) {
-		String pname,pdescription,pimage;
-		int pid,pprice,pweight,pquantity,pcategory;
-		try
-		{
+	public String updateproduct(@RequestParam("pid") int id, Model model) {
+		String pname, pdescription, pimage;
+		int pid, pprice, pweight, pquantity, pcategory;
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
 			Statement stmt = con.createStatement();
 			Statement stmt2 = con.createStatement();
-			ResultSet rst = stmt.executeQuery("select * from products where id = "+id+";");
-			
-			if(rst.next())
-			{
-			pid = rst.getInt(1);
-			pname = rst.getString(2);
-			pimage = rst.getString(3);
-			pcategory = rst.getInt(4);
-			pquantity = rst.getInt(5);
-			pprice =  rst.getInt(6);
-			pweight =  rst.getInt(7);
-			pdescription = rst.getString(8);
-			model.addAttribute("pid",pid);
-			model.addAttribute("pname",pname);
-			model.addAttribute("pimage",pimage);
-			ResultSet rst2 = stmt.executeQuery("select * from categories where categoryid = "+pcategory+";");
-			if(rst2.next())
-			{
-				model.addAttribute("pcategory",rst2.getString(2));
+			ResultSet rst = stmt.executeQuery("select * from products where id = " + id + ";");
+
+			if (rst.next()) {
+				pid = rst.getInt(1);
+				pname = rst.getString(2);
+				pimage = rst.getString(3);
+				pcategory = rst.getInt(4);
+				pquantity = rst.getInt(5);
+				pprice = rst.getInt(6);
+				pweight = rst.getInt(7);
+				pdescription = rst.getString(8);
+				model.addAttribute("pid", pid);
+				model.addAttribute("pname", pname);
+				model.addAttribute("pimage", pimage);
+				ResultSet rst2 = stmt.executeQuery("select * from categories where categoryid = " + pcategory + ";");
+				if (rst2.next()) {
+					model.addAttribute("pcategory", rst2.getString(2));
+				}
+				model.addAttribute("pquantity", pquantity);
+				model.addAttribute("pprice", pprice);
+				model.addAttribute("pweight", pweight);
+				model.addAttribute("pdescription", pdescription);
 			}
-			model.addAttribute("pquantity",pquantity);
-			model.addAttribute("pprice",pprice);
-			model.addAttribute("pweight",pweight);
-			model.addAttribute("pdescription",pdescription);
-			}
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		return "productsUpdate";
 	}
-	@RequestMapping(value = "admin/products/updateData",method=RequestMethod.POST)
-	public String updateproducttodb(@RequestParam("id") int id,@RequestParam("name") String name, @RequestParam("price") int price, @RequestParam("weight") int weight, @RequestParam("quantity") int quantity, @RequestParam("description") String description, @RequestParam("productImage") String picture ) 
-	
+
+	@RequestMapping(value = "admin/products/updateData", method = RequestMethod.POST)
+	public String updateproducttodb(@RequestParam("id") int id, @RequestParam("name") String name,
+			@RequestParam("price") int price, @RequestParam("weight") int weight,
+			@RequestParam("quantity") int quantity, @RequestParam("description") String description,
+			@RequestParam("productImage") String picture)
+
 	{
-		try
-		{
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
-			
-			PreparedStatement pst = con.prepareStatement("update products set name= ?,image = ?,quantity = ?, price = ?, weight = ?,description = ? where id = ?;");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
+
+			PreparedStatement pst = con.prepareStatement(
+					"update products set name= ?,image = ?,quantity = ?, price = ?, weight = ?,description = ? where id = ?;");
 			pst.setString(1, name);
 			pst.setString(2, picture);
 			pst.setInt(3, quantity);
@@ -231,131 +227,155 @@ public class AdminController {
 			pst.setInt(5, weight);
 			pst.setString(6, description);
 			pst.setInt(7, id);
-			int i = pst.executeUpdate();			
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+			int i = pst.executeUpdate();
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		return "redirect:/admin/products";
 	}
-	
+
 	@GetMapping("/admin/products/delete")
-	public String removeProductDb(@RequestParam("id") int id)
-	{
-		try
-		{
+	public String removeProductDb(@RequestParam("id") int id) {
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
-			
-			
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
+
 			PreparedStatement pst = con.prepareStatement("delete from products where id = ? ;");
 			pst.setInt(1, id);
 			int i = pst.executeUpdate();
-			
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		return "redirect:/admin/products";
 	}
-	
+
 	@PostMapping("/admin/products")
 	public String postproduct() {
 		return "redirect:/admin/categories";
 	}
-	@RequestMapping(value = "admin/products/sendData",method=RequestMethod.POST)
-	public String addproducttodb(@RequestParam("name") String name, @RequestParam("categoryid") String catid, @RequestParam("price") int price, @RequestParam("weight") int weight, @RequestParam("quantity") int quantity, @RequestParam("description") String description, @RequestParam("productImage") String picture ) {
-		
-		try
-		{
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
+
+	@RequestMapping(value = "admin/products/sendData", method = RequestMethod.POST)
+	public String addproducttodb(@RequestParam("name") String name, @RequestParam("categoryid") String catid,
+			@RequestParam("price") int price, @RequestParam("weight") int weight,
+			@RequestParam("quantity") int quantity, @RequestParam("description") String description,
+			@RequestParam("productImage") String picture) {
+
+		try {
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
 			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from categories where name = '"+catid+"';");
-			if(rs.next())
-			{
-			int categoryid = rs.getInt(1);
-			
-			PreparedStatement pst = con.prepareStatement("insert into products(name,image,categoryid,quantity,price,weight,description) values(?,?,?,?,?,?,?);");
-			pst.setString(1,name);
-			pst.setString(2, picture);
-			pst.setInt(3, categoryid);
-			pst.setInt(4, quantity);
-			pst.setInt(5, price);
-			pst.setInt(6, weight);
-			pst.setString(7, description);
-			int i = pst.executeUpdate();
+			ResultSet rs = stmt.executeQuery("select * from categories where name = '" + catid + "';");
+			if (rs.next()) {
+				int categoryid = rs.getInt(1);
+
+				PreparedStatement pst = con.prepareStatement(
+						"insert into products(name,image,categoryid,quantity,price,weight,description) values(?,?,?,?,?,?,?);");
+				pst.setString(1, name);
+				pst.setString(2, picture);
+				pst.setInt(3, categoryid);
+				pst.setInt(4, quantity);
+				pst.setInt(5, price);
+				pst.setInt(6, weight);
+				pst.setString(7, description);
+				int i = pst.executeUpdate();
 			}
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		return "redirect:/admin/products";
 	}
-	
+
 	@GetMapping("/admin/customers")
 	public String getCustomerDetail() {
 		return "displayCustomers";
 	}
-	
-	
+
 	@GetMapping("profileDisplay")
 	public String profileDisplay(Model model) {
-		String displayusername,displaypassword,displayemail,displayaddress;
-		try
-		{
+		String displayusername, displaypassword, displayemail, displayaddress;
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
 			Statement stmt = con.createStatement();
-			ResultSet rst = stmt.executeQuery("select * from users where username = '"+usernameforclass+"';");
-			
-			if(rst.next())
-			{
-			int userid = rst.getInt(1);
-			displayusername = rst.getString(2);
-			displayemail = rst.getString(3);
-			displaypassword = rst.getString(4);
-			displayaddress = rst.getString(5);
-			model.addAttribute("userid",userid);
-			model.addAttribute("username",displayusername);
-			model.addAttribute("email",displayemail);
-			model.addAttribute("password",displaypassword);
-			model.addAttribute("address",displayaddress);
+			ResultSet rst = stmt.executeQuery("select * from users where username = '" + usernameforclass + "';");
+
+			if (rst.next()) {
+				int userid = rst.getInt(1);
+				displayusername = rst.getString(2);
+				displayemail = rst.getString(3);
+				displaypassword = rst.getString(4);
+				displayaddress = rst.getString(5);
+				model.addAttribute("userid", userid);
+				model.addAttribute("username", displayusername);
+				model.addAttribute("email", displayemail);
+				model.addAttribute("password", displaypassword);
+				model.addAttribute("address", displayaddress);
 			}
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		System.out.println("Hello");
 		return "updateProfile";
 	}
-	
-	@RequestMapping(value = "updateuser",method=RequestMethod.POST)
-	public String updateUserProfile(@RequestParam("userid") int userid,@RequestParam("username") String username, @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("address") String address) 
-	
+
+	@RequestMapping(value = "updateuser", method = RequestMethod.POST)
+	public String updateUserProfile(@RequestParam("userid") int userid, @RequestParam("username") String username,
+			@RequestParam("email") String email, @RequestParam("password") String password,
+			@RequestParam("address") String address)
+
 	{
-		try
-		{
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject","root","");
-			
-			PreparedStatement pst = con.prepareStatement("update users set username= ?,email = ?,password= ?, address= ? where uid = ?;");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
+
+			PreparedStatement pst = con
+					.prepareStatement("update users set username= ?,email = ?,password= ?, address= ? where uid = ?;");
 			pst.setString(1, username);
 			pst.setString(2, email);
 			pst.setString(3, password);
 			pst.setString(4, address);
 			pst.setInt(5, userid);
-			int i = pst.executeUpdate();	
+			int i = pst.executeUpdate();
 			usernameforclass = username;
-		}
-		catch(Exception e)
-		{
-			System.out.println("Exception:"+e);
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
 		}
 		return "redirect:/index";
+	}
+
+	@GetMapping("/admin/bestdeal")
+	public String getBestDeal(Model model) {
+		try {
+			Product bestDealProduct = getBestSellingProduct();
+			model.addAttribute("bestDealProduct", bestDealProduct);
+			return "bestdeal";
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+			return "error";
+		}
+	}
+
+	private Product getBestSellingProduct() throws Exception {
+		Product product = null;
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
+		Statement stmt = con.createStatement();
+		String query ="select * from products;";// "SELECT p.*, SUM(o.quantity) as total_quantity FROM products p JOIN orders o ON p.id = o.product_id GROUP BY p.id ORDER BY total_quantity DESC LIMIT 1";// 商品テーブルと注文テーブルを結合,最も売れ行きの良い商品を取得するための SQL クエリを定義.このクエリでは、商品テーブルと注文テーブルを結合し、商品 ID ごとに注文数量を合計して、合計数量が最も多い商品を取得
+		ResultSet rs = stmt.executeQuery(query);
+
+		if (rs.next()) {
+			int id = rs.getInt("id");
+			String name = rs.getString("name");
+			String image = rs.getString("image");
+			int categoryId = rs.getInt("categoryid");
+			int quantity = rs.getInt("quantity");
+			int price = rs.getInt("price");
+			int weight = rs.getInt("weight");
+			String description = rs.getString("description");
+			product = new Product(id, name, image, categoryId, quantity, price, weight, description);
+		}
+
+		return product;
 	}
 
 }
