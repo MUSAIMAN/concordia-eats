@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Best Deal</title>
-   
 </head>
 <body>
     <h1>Best Deal</h1>
