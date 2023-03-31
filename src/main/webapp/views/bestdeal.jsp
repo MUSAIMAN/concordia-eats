@@ -7,7 +7,6 @@
 </head>
 <body>
     <h1>BestDeal</h1>
-   
     <div>
     <img src="${bestDealProduct.image}" alt="Product Image">
     <h2>${bestDealProduct.name}</h2>
