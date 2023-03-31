@@ -6,7 +6,7 @@
     <title>Best Deal</title>
 </head>
 <body>
-    <h1>Best Deal</h1>
+    <h1>BestDeal</h1>
    
     <div>
     <img src="${bestDealProduct.image}" alt="Product Image">
