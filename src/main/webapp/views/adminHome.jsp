@@ -87,7 +87,7 @@
         <div class="card-body text-center">
             <h4 class="card-title">Best Deal</h4>
             <p>---------------------------------------------</p>
-            <p class="card-text">View the best deal products here.</p>
+            <p class="card-text">View the best deal products here(just testing for best deal method on the adminside! i will delete after).</p>
             <a href="/admin/bestdeal" class="card-link btn btn-primary">View</a>
         </div>
     </div>
