@@ -74,7 +74,7 @@
 			<div class="col-sm-3 pt-4">
 				<div class="card" style="background-color: white;">
 					<div class="card-body text-center">
-						<h4 class="card-title">Custddddomers</h4>
+						<h4 class="card-title">Customers</h4>
 						<p>---------------------------------------------</p>
 						<p class="card-text">Manage all the customer here.</p>
 						<a href="/admin/customers" class="card-link btn btn-primary">Manage</a>
@@ -92,7 +92,17 @@
         </div>
     </div>
 </div>
-			
+		
+			<div class="col-sm-3 pt-4">
+    <div class="card" style="background-color: white;">
+        <div class="card-body text-center">
+            <h4 class="card-title">mostSelling & leastSelling</h4>
+            <p>---------------------------------------------</p>
+            <p class="card-text">View the most selling and least selling items here.</p>
+            <a href="/admin/products" class="card-link btn btn-primary">View</a>
+        </div>
+    </div>
+</div>	
 		</div>
 	</div>
 
