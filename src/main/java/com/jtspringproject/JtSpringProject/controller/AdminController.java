@@ -360,7 +360,7 @@ public class AdminController {
 		Class.forName("com.mysql.jdbc.Driver");
 		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/springproject", "root", "");
 		Statement stmt = con.createStatement();
-		String query ="select * from products;";// test,// 商品テーブルと注文テーブルを結合,最も売れ行きの良い商品を取得するための SQL クエリを定義.このクエリでは、商品テーブルと注文テーブルを結合し、商品 ID ごとに注文数量を合計して、合計数量が最も多い商品を取得
+		String query ="select * from products;";// test// 商品テーブルと注文テーブルを結合,最も売れ行きの良い商品を取得するための SQL クエリを定義.このクエリでは、商品テーブルと注文テーブルを結合し、商品 ID ごとに注文数量を合計して、合計数量が最も多い商品を取得
 		ResultSet rs = stmt.executeQuery(query);
 
 		if (rs.next()) {
